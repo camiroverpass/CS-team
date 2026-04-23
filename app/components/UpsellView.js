@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import Link from "next/link";
 
 function isUrl(v) {
   return typeof v === "string" && /^https?:\/\//i.test(v.trim());
@@ -115,73 +113,64 @@ function ByRepView({ sections, grandTotal }) {
   );
 }
 
-export default function UpsellsTabs({ tabs }) {
-  const [active, setActive] = useState(tabs[0]?.key ?? "");
-  const current = tabs.find((t) => t.key === active) ?? tabs[0];
-  if (!current) return null;
-
+export default function UpsellView({ tab }) {
   return (
-    <div>
-      <div className="flex gap-1 border-b border-slate-200 mb-6 overflow-x-auto">
-        {tabs.map((t) => {
-          const isActive = t.key === active;
-          return (
-            <button
-              key={t.key}
-              onClick={() => setActive(t.key)}
-              className={
-                "px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition " +
-                (isActive
-                  ? "border-roverpass-500 text-roverpass-700"
-                  : "border-transparent text-slate-500 hover:text-slate-800")
-              }
-            >
-              {t.label}
-            </button>
-          );
-        })}
+    <main className="max-w-7xl mx-auto p-6">
+      <div className="mb-4">
+        <Link
+          href="/upsells"
+          className="text-sm text-slate-500 hover:text-roverpass-600"
+        >
+          ← Back to Upsells
+        </Link>
       </div>
 
-      {current.error && (
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold text-slate-900">{tab.label}</h1>
+        {tab.kind === "commissions" && (
+          <p className="text-sm text-slate-500 mt-1">
+            Commission rates per product — paid at contract signing and when
+            the product goes live.
+          </p>
+        )}
+      </header>
+
+      {tab.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-900 text-sm">
-          <div className="font-semibold">Could not load {current.label}</div>
-          <div className="mt-1">{current.error}</div>
+          <div className="font-semibold">Could not load {tab.label}</div>
+          <div className="mt-1">{tab.error}</div>
         </div>
       )}
 
-      {!current.error && current.kind === "by-rep" && (
-        <ByRepView sections={current.sections} grandTotal={current.grandTotal} />
+      {!tab.error && tab.kind === "by-rep" && (
+        <ByRepView sections={tab.sections} grandTotal={tab.grandTotal} />
       )}
 
-      {!current.error && current.kind === "flat" && (
+      {!tab.error && tab.kind === "flat" && (
         <>
           <div className="mb-4 text-sm text-slate-600">
             <span className="font-semibold text-slate-900">
-              {(current.rows ?? []).length}
+              {(tab.rows ?? []).length}
             </span>{" "}
-            deal{(current.rows ?? []).length === 1 ? "" : "s"}
+            deal{(tab.rows ?? []).length === 1 ? "" : "s"}
           </div>
           <GenericTable
-            headers={current.headers || []}
-            data={current.rows || []}
+            headers={tab.headers || []}
+            data={tab.rows || []}
             emptyText="No deals logged this quarter"
           />
         </>
       )}
 
-      {!current.error && current.kind === "commissions" && (
+      {!tab.error && tab.kind === "commissions" && (
         <div className="max-w-2xl">
-          <p className="text-sm text-slate-500 mb-3">
-            Commission rates per product — paid at contract signing and when the
-            product goes live.
-          </p>
           <GenericTable
-            headers={current.headers || []}
-            data={current.rows || []}
+            headers={tab.headers || []}
+            data={tab.rows || []}
             emptyText="No commission rates"
           />
         </div>
       )}
-    </div>
+    </main>
   );
 }
