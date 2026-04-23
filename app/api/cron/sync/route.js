@@ -5,8 +5,18 @@ import { supabaseAdmin } from "../../../../lib/supabase.js";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+function normalizeProblem(p) {
+  if (!p) return null;
+  const parts = String(p)
+    .split(";")
+    .map((s) => s.trim())
+    .filter((s) => s && !/^none$/i.test(s));
+  if (parts.length === 0) return null;
+  return parts.join("; ");
+}
+
 function mapTicket(t) {
-  const problem = t.cf?.cf_problem || t.cf?.problem || null;
+  const problem = normalizeProblem(t.cf?.cf_problem || t.cf?.problem || null);
   const created = t.createdTime || null;
   const closed = t.closedTime || null;
   const close_hours =
@@ -57,7 +67,10 @@ export async function GET(req) {
     return NextResponse.json({ synced: 0, since: sinceIso });
   }
 
-  const rows = tickets.map(mapTicket);
+  const dedupedMap = new Map();
+  for (const t of tickets) dedupedMap.set(String(t.id), mapTicket(t));
+  const rows = Array.from(dedupedMap.values());
+
   const { error } = await supabase.from("tickets").upsert(rows, { onConflict: "id" });
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
