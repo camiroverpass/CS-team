@@ -7,6 +7,7 @@ const NAV = [
   { href: "/customer-success", label: "Customer Success" },
   { href: "/onboarding",       label: "Onboarding" },
   { href: "/upsells",          label: "Upsells" },
+  { href: "/pending",          label: "Pending" },
   { href: "/ptos",             label: "PTOs" },
   { href: "/wellness-score",   label: "Wellness Score" },
 ];
