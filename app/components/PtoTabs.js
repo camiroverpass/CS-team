@@ -18,7 +18,6 @@ function PtoTable({ rows }) {
             <th className="py-2 px-4 font-semibold">Start Date</th>
             <th className="py-2 px-4 font-semibold">End Date</th>
             <th className="py-2 px-4 font-semibold">Hours</th>
-            <th className="py-2 px-4 font-semibold">Type</th>
           </tr>
         </thead>
         <tbody>
@@ -27,7 +26,6 @@ function PtoTable({ rows }) {
               <td className="py-2 px-4 text-slate-700">{r.startDate || "—"}</td>
               <td className="py-2 px-4 text-slate-700">{r.endDate || "—"}</td>
               <td className="py-2 px-4 text-slate-700">{r.hours || "—"}</td>
-              <td className="py-2 px-4 text-slate-700">{r.type || "—"}</td>
             </tr>
           ))}
         </tbody>
@@ -36,27 +34,24 @@ function PtoTable({ rows }) {
   );
 }
 
-function SummaryBlock({ rows }) {
-  if (rows.length === 0) return null;
+function SummaryBlock({ summary }) {
+  if (!summary) return null;
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
       <table className="w-full text-sm">
+        <thead className="bg-slate-50 text-left text-slate-600 border-b border-slate-200">
+          <tr>
+            <th className="py-2 px-4 font-semibold">PTO Remaining (hours)</th>
+            <th className="py-2 px-4 font-semibold">Days issued</th>
+            <th className="py-2 px-4 font-semibold">Days left</th>
+          </tr>
+        </thead>
         <tbody>
-          {rows.map((cols, i) => (
-            <tr key={i} className="border-b border-slate-100 last:border-0">
-              {cols.map((c, j) => (
-                <td
-                  key={j}
-                  className={
-                    "py-2 px-4 align-top " +
-                    (j === 0 ? "text-slate-700 font-medium w-64" : "text-slate-600")
-                  }
-                >
-                  {c || ""}
-                </td>
-              ))}
-            </tr>
-          ))}
+          <tr>
+            <td className="py-2 px-4 text-slate-700">{summary.remaining || "—"}</td>
+            <td className="py-2 px-4 text-slate-700">{summary.daysIssued || "—"}</td>
+            <td className="py-2 px-4 text-slate-700">{summary.daysLeft || "—"}</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -101,16 +96,16 @@ export default function PtoTabs({ people }) {
         <div className="space-y-6">
           <section>
             <h2 className="text-sm font-semibold text-slate-700 mb-2">
-              PTO taken
+              Summary
             </h2>
-            <PtoTable rows={current.ptoRows} />
+            <SummaryBlock summary={current.summary} />
           </section>
 
           <section>
             <h2 className="text-sm font-semibold text-slate-700 mb-2">
-              Summary &amp; Holidays
+              PTO taken
             </h2>
-            <SummaryBlock rows={current.summary} />
+            <PtoTable rows={current.ptoRows} />
           </section>
         </div>
       )}
